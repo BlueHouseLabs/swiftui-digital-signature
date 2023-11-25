@@ -84,7 +84,7 @@ public struct SignatureView: View {
                 fontFamily: fontFamily,
                 fontSize: fontSize,
                 lineColor: lineColor,
-                canvasColor: lineColor,
+                canvasColor: canvasColor,
                 placeholderText: placeholderText,
                 maxHeight: maxHeight
             )
