@@ -29,7 +29,8 @@ public struct SignatureView: View {
     private let fontFamilies: [String]
     @State private var fontFamily: String
     private let fontSize: CGFloat
-    @State private var color = Color.blue
+    @State private var lineColor: Color
+    @State private var canvasColor: Color
     
     @State private var drawing = DrawingPath()
     @State private var image = UIImage()
@@ -69,7 +70,7 @@ public struct SignatureView: View {
                     )
                 }
                 if showColorPicker {
-                    ColorPickerShim(selection: $color)
+                    ColorPickerShim(selection: $lineColor)
                 }
             }
             Spacer()
@@ -82,7 +83,8 @@ public struct SignatureView: View {
                 drawing: $drawing,
                 fontFamily: fontFamily,
                 fontSize: fontSize,
-                color: color,
+                lineColor: lineColor,
+                canvasColor: lineColor,
                 placeholderText: placeholderText,
                 maxHeight: maxHeight
             )
@@ -97,7 +99,7 @@ public struct SignatureView: View {
                 text: $text,
                 fontFamily: $fontFamily,
                 fontSize: fontSize,
-                color: $color,
+                color: $lineColor,
                 placeholderText: placeholderText
             )
         }
@@ -106,7 +108,8 @@ public struct SignatureView: View {
     public init(
         availableTabs: [Tab] = Tab.allCases,
         showColorPicker: Bool = true,
-        color: Color = .blue,
+        lineColor: Color = .blue,
+        canvasColor: Color = .white,
         lineWidth: CGFloat = 5,
         placeholderText: String = "Signature",
         fontFamilies: [String] = ["Zapfino", "SavoyeLetPlain", "SnellRoundhand", "SnellRoundhand-Black"],
@@ -118,7 +121,8 @@ public struct SignatureView: View {
     ) {
         self.availableTabs = availableTabs
         self.showColorPicker = showColorPicker
-        self.color = color
+        self.lineColor = lineColor
+        self.canvasColor = canvasColor
         self.lineWidth = lineWidth
         self.placeholderText = placeholderText
         self.fontFamilies = fontFamilies
@@ -140,7 +144,7 @@ public struct SignatureView: View {
             let maxX = drawing.points.map { $0.x }.max() ?? 0
             let renderer = UIGraphicsImageRenderer(size: CGSize(width: maxX, height: maxHeight))
             let uiImage = renderer.image { ctx in
-                ctx.cgContext.setStrokeColor(color.uiColor.cgColor)
+                ctx.cgContext.setStrokeColor(lineColor.uiColor.cgColor)
                 ctx.cgContext.setLineWidth(lineWidth)
                 ctx.cgContext.beginPath()
                 ctx.cgContext.addPath(path)
@@ -159,7 +163,7 @@ public struct SignatureView: View {
                 
                 let attrs = [
                     NSAttributedString.Key.font: UIFont(name: fontFamily, size: fontSize)!,
-                    NSAttributedString.Key.foregroundColor: color.uiColor,
+                    NSAttributedString.Key.foregroundColor: lineColor.uiColor,
                     NSAttributedString.Key.paragraphStyle: paragraphStyle
                 ]
                 text.draw(

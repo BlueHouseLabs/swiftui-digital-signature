@@ -18,17 +18,18 @@ struct FramePreferenceKey: PreferenceKey {
 struct SignatureDrawView: View {
     @Binding var drawing: DrawingPath
     
-    private var fontFamily: String
-    private var fontSize: CGFloat
-    private var color: Color
-    private var placeholderText: String
-    private var maxHeight: CGFloat
+    private let fontFamily: String
+    private let fontSize: CGFloat
+    private let lineColor: Color
+    private let canvasColor: Color
+    private let placeholderText: String
+    private let maxHeight: CGFloat
     
     @State private var drawingBounds: CGRect = .zero
     
     var body: some View {
         ZStack {
-            Color.clear
+            canvasColor
                 .background(GeometryReader { geometry in
                     Color.clear.preference(
                         key: FramePreferenceKey.self,
@@ -42,25 +43,26 @@ struct SignatureDrawView: View {
                 Text(placeholderText)
                     .foregroundColor(.gray)
                     .font(.custom(fontFamily, size: fontSize))
+                    .frame(maxWidth: .infinity)
             } else {
                 DrawShape(drawingPath: drawing)
                     .stroke(style: .init(lineWidth: 4, lineCap: .round, lineJoin: .round))
-                    .foregroundColor(color)
+                    .foregroundColor(lineColor)
             }
         }
         .frame(height: maxHeight)
         .gesture(
             DragGesture()
-            .onChanged { value in
-                if drawingBounds.contains(value.location) {
-                    drawing.addPoint(value.location)
-                } else {
+                .onChanged { value in
+                    if drawingBounds.contains(value.location) {
+                        drawing.addPoint(value.location)
+                    } else {
+                        drawing.addBreak()
+                    }
+                }
+                .onEnded { value in
                     drawing.addBreak()
                 }
-            }
-            .onEnded { value in
-                drawing.addBreak()
-            }
         )
         .overlay(
             RoundedRectangle(cornerRadius: 4)
@@ -72,14 +74,16 @@ struct SignatureDrawView: View {
         drawing: Binding<DrawingPath>,
         fontFamily: String,
         fontSize: CGFloat,
-        color: Color,
+        lineColor: Color,
+        canvasColor: Color,
         placeholderText: String,
         maxHeight: CGFloat
     ) {
         self._drawing = drawing
         self.fontFamily = fontFamily
         self.fontSize = fontSize
-        self.color = color
+        self.lineColor = lineColor
+        self.canvasColor = canvasColor
         self.placeholderText = placeholderText
         self.maxHeight = maxHeight
     }
