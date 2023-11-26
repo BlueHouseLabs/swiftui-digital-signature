@@ -40,15 +40,12 @@ public struct SignatureView: View {
     public var body: some View {
         VStack {
             HStack() {
-                if !showCancelButton {
-                    Spacer()
-                }
-                Button("Done", action: extractImageAndHandle)
-                    .font(.body.bold())
                 if showCancelButton {
-                    Spacer()
                     Button("Cancel", action: onCancel)
                 }
+                Spacer()
+                Button("Done", action: extractImageAndHandle)
+                    .font(.body.bold())
             }
             if availableTabs.count > 1 {
                 Picker(selection: $selectedTab, label: EmptyView()) {
@@ -73,7 +70,6 @@ public struct SignatureView: View {
                     ColorPickerShim(selection: $lineColor)
                 }
             }
-            Spacer()
         }.padding()
     }
     
